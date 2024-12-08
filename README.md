@@ -83,6 +83,8 @@ A modern e-commerce platform built with Django, featuring product management, sh
 
 ### Login Page
 ![Login Page](screenshots/login.png)
+![{E0C5B078-BA10-4E67-B472-70047DDC5C85}](https://github.com/user-attachments/assets/4ccde7c1-2266-4b06-ac56-e7694e1c9c98)
+
 *User login interface with clean design*
 
 ### Registration Page
