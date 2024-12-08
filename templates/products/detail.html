@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'products:product_list' %}">Products</a></li>
+            <li class="breadcrumb-item"><a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Product Image -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/600x400" class="card-img-top" alt="No image available">
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="col-md-6">
+            <h1 class="mb-3">{{ product.name }}</h1>
+            <p class="text-muted mb-3">Category: <a href="{{ product.category.get_absolute_url }}" class="text-decoration-none">{{ product.category.name }}</a></p>
+            
+            <div class="mb-4">
+                <h2 class="h4 mb-3">Description</h2>
+                <p>{{ product.description }}</p>
+            </div>
+
+            <div class="mb-4">
+                <h3 class="h2 mb-0 text-primary">${{ product.price }}</h3>
+                <p class="text-success mt-2">
+                    {% if product.available %}
+                        <i class="fas fa-check-circle"></i> In Stock
+                    {% else %}
+                        <i class="fas fa-times-circle text-danger"></i> Out of Stock
+                    {% endif %}
+                </p>
+            </div>
+
+            {% if product.available %}
+                <form method="post" action="{% url 'cart:cart_add' product.id %}" class="mb-4">
+                    {% csrf_token %}
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="input-group" style="width: 130px;">
+                                <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity()">-</button>
+                                <input type="number" name="quantity" value="1" min="1" max="99" class="form-control text-center" id="quantity">
+                                <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity()">+</button>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            {% endif %}
+
+            <!-- Additional Product Information -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Product Details</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tr>
+                            <td class="text-muted">SKU:</td>
+                            <td>{{ product.id }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Category:</td>
+                            <td>{{ product.category.name }}</td>
+                        </tr>
+                        {% if product.brand %}
+                        <tr>
+                            <td class="text-muted">Brand:</td>
+                            <td>{{ product.brand }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function incrementQuantity() {
+        var input = document.getElementById('quantity');
+        var value = parseInt(input.value, 10);
+        if (value < 99) {
+            input.value = value + 1;
+        }
+    }
+
+    function decrementQuantity() {
+        var input = document.getElementById('quantity');
+        var value = parseInt(input.value, 10);
+        if (value > 1) {
+            input.value = value - 1;
+        }
+    }
+</script>
+{% endblock %}

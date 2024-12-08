@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Profile</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Account Information</h4>
+                            <p><strong>Username:</strong> {{ user.username }}</p>
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            <p><strong>Name:</strong> {{ user.get_full_name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Contact Information</h4>
+                            <p><strong>Phone:</strong> {{ user.phone_number|default:"Not provided" }}</p>
+                            <p><strong>Address:</strong> {{ user.address|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if user.orders.all %}
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3>Order History</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Date</th>
+                                        <th>Total Items</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in user.orders.all %}
+                                        <tr>
+                                            <td>{{ order.id }}</td>
+                                            <td>{{ order.created|date:"M d, Y" }}</td>
+                                            <td>{{ order.items.count }}</td>
+                                            <td>{% if order.paid %}Paid{% else %}Pending{% endif %}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

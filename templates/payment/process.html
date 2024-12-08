@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Pay your order{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title">Order Summary</h1>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th>Order Number:</th>
+                                <td>#{{ order.id }}</td>
+                            </tr>
+                            <tr>
+                                <th>Total Amount:</th>
+                                <td>${{ order.get_total_cost }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <form action="{% url 'payment:process' %}" method="post" class="text-center">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Pay Now</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

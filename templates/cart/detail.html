@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Shopping Cart
+{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Shopping Cart</h1>
+    {% if cart %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Price</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart %}
+                    {% with product=item.product %}
+                        <tr>
+                            <td>
+                                <a href="{{ product.get_absolute_url }}" class="text-decoration-none">
+                                    {{ product.name }}
+                                </a>
+                            </td>
+                            <td>
+                                <form action="{% url 'cart:cart_add' product.id %}" method="post" class="d-flex align-items-center">
+                                    {{ item.update_quantity_form.quantity }}
+                                    {{ item.update_quantity_form.override }}
+                                    {% csrf_token %}
+                                    <input type="submit" value="Update" class="btn btn-sm btn-outline-secondary ms-2">
+                                </form>
+                            </td>
+                            <td>${{ item.price }}</td>
+                            <td>${{ item.total_price }}</td>
+                            <td>
+                                <form action="{% url 'cart:cart_remove' product.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="submit" value="Remove" class="btn btn-sm btn-danger">
+                                </form>
+                            </td>
+                        </tr>
+                    {% endwith %}
+                {% endfor %}
+                <tr class="table-primary">
+                    <td colspan="4"><strong>Total</strong></td>
+                    <td><strong>${{ cart.get_total_price }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="text-end">
+            <a href="{% url 'products:product_list' %}" class="btn btn-secondary">
+                Continue Shopping
+            </a>
+            <a href="{% url 'orders:order_create' %}" class="btn btn-success">
+                Checkout
+            </a>
+        </p>
+    {% else %}
+        <div class="alert alert-info">
+            Your cart is empty. <a href="{% url 'products:product_list' %}" class="alert-link">Continue shopping</a>
+        </div>
+    {% endif %}
+{% endblock %}

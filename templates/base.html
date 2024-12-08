@@ -1,0 +1,306 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - E-Shop</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #f68b1e;
+            --secondary-color: #264996;
+        }
+        
+        .navbar {
+            background-color: white !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 0.5rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 2rem;
+            color: var(--primary-color) !important;
+        }
+
+        .search-form {
+            flex-grow: 1;
+            max-width: 700px;
+            margin: 0 2rem;
+        }
+
+        .search-input {
+            border-radius: 4px 0 0 4px !important;
+            border: 2px solid var(--primary-color);
+            border-right: none;
+        }
+
+        .search-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            padding: 0.5rem 2rem;
+        }
+
+        .nav-link {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .product-card {
+            border: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 1rem;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-card .card-img-top {
+            height: 200px;
+            object-fit: contain;
+            padding: 1rem;
+        }
+
+        .product-title {
+            font-size: 0.9rem;
+            height: 2.4em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .product-price {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .discount-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #d41b3f;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+        }
+
+        .rating-stars {
+            color: #f68b1e;
+            font-size: 0.8rem;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            padding: 0.2em 0.5em;
+            font-size: 0.7rem;
+        }
+
+        .category-sidebar {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .category-link {
+            color: #333;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            display: block;
+            border-bottom: 1px solid #eee;
+        }
+
+        .category-link:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-color);
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1 0 auto;
+        }
+        footer {
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'products:product_list' %}">E-Shop</a>
+            
+            <form class="search-form d-flex">
+                <input class="form-control search-input" type="search" placeholder="Search products, brands and categories" aria-label="Search">
+                <button class="search-button" type="submit">SEARCH</button>
+            </form>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cart:cart_detail' %}">
+                            <i class="fas fa-shopping-cart fa-lg"></i>
+                            {% with total_items=cart|length %}
+                                {% if total_items > 0 %}
+                                    <span class="cart-count">{{ total_items }}</span>
+                                {% endif %}
+                            {% endwith %}
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i>{{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
+                                <li><a class="dropdown-item" href="#">Orders</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" action="{% url 'logout' %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item">Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">Register</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Help">
+                            <i class="fas fa-question-circle fa-lg"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container mt-4">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <footer class="bg-dark text-light py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>LET US HELP YOU</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-light">Your Account</a></li>
+                        <li><a href="#" class="text-light">Shipping Rates & Policies</a></li>
+                        <li><a href="#" class="text-light">Returns & Replacements</a></li>
+                        <li><a href="#" class="text-light">Help Center</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>ABOUT E-SHOP</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-light">About Us</a></li>
+                        <li><a href="#" class="text-light">Careers</a></li>
+                        <li><a href="#" class="text-light">Privacy Policy</a></li>
+                        <li><a href="#" class="text-light">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>MAKE MONEY WITH US</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-light">Sell on E-Shop</a></li>
+                        <li><a href="#" class="text-light">Become an Affiliate</a></li>
+                        <li><a href="#" class="text-light">Advertise Your Products</a></li>
+                        <li><a href="#" class="text-light">Self-Publish with Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>CONNECT WITH US</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-light"><i class="fab fa-facebook"></i> Facebook</a></li>
+                        <li><a href="#" class="text-light"><i class="fab fa-twitter"></i> Twitter</a></li>
+                        <li><a href="#" class="text-light"><i class="fab fa-instagram"></i> Instagram</a></li>
+                        <li><a href="#" class="text-light"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h5>PAYMENT METHODS</h5>
+                    <div class="payment-icons">
+                        <i class="fab fa-cc-visa fa-2x mx-2"></i>
+                        <i class="fab fa-cc-mastercard fa-2x mx-2"></i>
+                        <i class="fab fa-cc-paypal fa-2x mx-2"></i>
+                        <i class="fab fa-cc-stripe fa-2x mx-2"></i>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h5>NEWSLETTER</h5>
+                    <form class="d-flex">
+                        <input type="email" class="form-control me-2" placeholder="Your Email Address">
+                        <button class="btn btn-warning" type="submit">SUBSCRIBE</button>
+                    </form>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col text-center">
+                    <p class="mb-0">&copy; {% now "Y" %} E-Shop. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+</body>
+</html>
