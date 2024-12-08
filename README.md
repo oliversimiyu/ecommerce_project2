@@ -117,6 +117,14 @@ A modern e-commerce platform built with Django, featuring product management, sh
 ![Payment Success](screenshots/payment-success.png)
 *Payment confirmation page after successful transaction*
 
+### Admin Interface
+![Admin Interface](screenshots/admin.png)
+*Django admin interface for managing products, orders, and users*
+
+### Admin Login
+![Admin Login](screenshots/admin-login.png)
+*Secure admin login interface*
+
 ## Setup Instructions
 1. Create a virtual environment:
    ```
