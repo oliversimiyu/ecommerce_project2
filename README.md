@@ -82,49 +82,58 @@ A modern e-commerce platform built with Django, featuring product management, sh
 ## Screenshots
 
 ### Login Page
-![Login Page](screenshots/login.png)
 ![{E0C5B078-BA10-4E67-B472-70047DDC5C85}](https://github.com/user-attachments/assets/4ccde7c1-2266-4b06-ac56-e7694e1c9c98)
 
 *User login interface with clean design*
 
 ### Registration Page
-![Registration Page](screenshots/register.png)
+![{C0DAE3D1-DE4B-4D34-9BEC-8CA9F6868574}](https://github.com/user-attachments/assets/27e603f9-42b6-4b1e-a996-9cdd81070ccc)
+
 *New user registration with form validation*
 
 ### Product Listing
-![Product Listing](screenshots/products.png)
+![{1A9B5A8E-A228-480D-8ECE-69B6A2E946F7}](https://github.com/user-attachments/assets/d324ae3b-99f4-4b3c-9d15-94319a84967d)
+
 *Product catalog with categories and search functionality*
 
 ### Product Detail
-![Product Detail](screenshots/product-detail.png)
+![{348853DD-AB40-4398-9222-17551B4517D9}](https://github.com/user-attachments/assets/ed79d188-9a9b-4ec1-9a8c-bbb606fa45a6)
+
 *Detailed product view with add to cart option*
 
 ### Shopping Cart
-![Shopping Cart](screenshots/cart.png)
+![{C6524670-0CF5-4F2C-9A99-F757ABF9A34E}](https://github.com/user-attachments/assets/0e20ab73-0bee-41ec-80d2-9444a622ea1b)
+
 *Shopping cart with quantity management*
 
 ### Checkout
-![Checkout](screenshots/checkout.png)
+![{5ED5C0F0-724F-4DFC-8264-BC75B3DC8924}](https://github.com/user-attachments/assets/e28914f0-b8ea-499d-aafa-b654cd0d83ab)
+
 *Secure checkout process with billing information*
 
 ### Order Summary
-![Order Summary](screenshots/order-summary.png)
+![{1EA436F2-3858-4D2A-BDBD-73688178145D}](https://github.com/user-attachments/assets/fb23775f-0c8e-40c6-93b2-702f42410457)
+
 *Order summary page showing order details and total amount*
 
 ### Payment Processing
-![Payment Processing](screenshots/payment-process.png)
+![{DE4FF501-6C3C-4022-970B-4055586FBFAE}](https://github.com/user-attachments/assets/87464748-dfe9-44e6-ac84-a1c14a8c8a5e)
+
 *Secure payment processing with Stripe integration*
 
 ### Payment Success
-![Payment Success](screenshots/payment-success.png)
+![{C16E33B7-7114-499E-A037-18BA21EA44A2}](https://github.com/user-attachments/assets/4cf90d1b-30ca-4a1b-8346-b4eab9440f91)
+
 *Payment confirmation page after successful transaction*
 
 ### Admin Interface
-![Admin Interface](screenshots/admin.png)
+![{43EBF634-8A47-4442-BD95-21ADBFB36F1F}](https://github.com/user-attachments/assets/41e8aad6-7937-43d8-b446-ac5b7bd019bd)
+
 *Django admin interface for managing products, orders, and users*
 
 ### Admin Login
-![Admin Login](screenshots/admin-login.png)
+![{506D57B9-BF13-43FD-B75F-5A318ACBDF5C}](https://github.com/user-attachments/assets/73e9e75a-46a4-4096-b05a-1bd0a19cad5d)
+
 *Secure admin login interface*
 
 ## Setup Instructions
