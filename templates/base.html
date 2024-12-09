@@ -157,8 +157,8 @@
             </button>
             <a class="navbar-brand" href="{% url 'products:product_list' %}">E-Shop</a>
             
-            <form class="search-form d-flex">
-                <input class="form-control search-input" type="search" placeholder="Search products, brands and categories" aria-label="Search">
+            <form class="search-form d-flex" action="{% url 'products:product_search' %}" method="get">
+                <input class="form-control search-input" type="search" name="q" placeholder="Search products, brands and categories" aria-label="Search" value="{{ search_query|default:'' }}">
                 <button class="search-button" type="submit">SEARCH</button>
             </form>
 

@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Category, Product
 from cart.forms import CartAddProductForm
+from django.db.models import Q
 
 # Create your views here.
 
@@ -26,3 +27,23 @@ def product_detail(request, id, slug):
                  'products/detail.html',
                  {'product': product,
                   'cart_product_form': cart_product_form})
+
+def product_search(request):
+    query = request.GET.get('q', '')
+    categories = Category.objects.all()
+    
+    if query:
+        products = Product.objects.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query) |
+            Q(category__name__icontains=query),
+            available=True
+        ).distinct()
+    else:
+        products = Product.objects.filter(available=True)
+    
+    return render(request,
+                 'products/list.html',
+                 {'products': products,
+                  'categories': categories,
+                  'search_query': query})
