@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Pay with M-Pesa{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Pay with M-Pesa</h2>
+                    
+                    <div class="alert alert-info">
+                        <h4 class="alert-heading">Order Total: KSh {{ order.get_total_cost }}</h4>
+                        <p class="mb-0">Please follow these steps to complete your payment:</p>
+                    </div>
+
+                    <ol class="list-group list-group-numbered mb-4">
+                        <li class="list-group-item">Go to M-Pesa on your phone</li>
+                        <li class="list-group-item">Select "Pay Bill"</li>
+                        <li class="list-group-item">Enter Business Number: <strong>123456</strong></li>
+                        <li class="list-group-item">Enter Account Number: <strong>{{ order.id }}</strong></li>
+                        <li class="list-group-item">Enter Amount: <strong>KSh {{ order.get_total_cost }}</strong></li>
+                        <li class="list-group-item">Enter your M-Pesa PIN</li>
+                    </ol>
+
+                    <form method="post" class="text-center">
+                        {% csrf_token %}
+                        <p class="text-muted mb-4">After making the payment, click the button below to confirm:</p>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            I've Made the Payment
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{% url 'payment:canceled' %}" class="text-decoration-none">
+                    Cancel and return to shop
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

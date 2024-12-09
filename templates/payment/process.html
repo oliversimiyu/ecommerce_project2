@@ -3,29 +3,52 @@
 {% block title %}Pay your order{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
                 <div class="card-body">
-                    <h1 class="card-title">Order Summary</h1>
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <th>Order Number:</th>
-                                <td>#{{ order.id }}</td>
-                            </tr>
-                            <tr>
-                                <th>Total Amount:</th>
-                                <td>${{ order.get_total_cost }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <form action="{% url 'payment:process' %}" method="post" class="text-center">
+                    <h2 class="card-title text-center mb-4">Order Payment</h2>
+                    
+                    <div class="alert alert-info mb-4">
+                        <h4 class="alert-heading">Order Total: KSh {{ order.get_total_cost }}</h4>
+                        <p class="mb-0">Please select your preferred payment method:</p>
+                    </div>
+
+                    <form method="post" id="payment-form">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-primary">Pay Now</button>
+                        
+                        <div class="mb-4">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="payment_method" 
+                                       id="mpesa" value="mpesa" checked>
+                                <label class="form-check-label" for="mpesa">
+                                    Pay with M-Pesa
+                                </label>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" 
+                                       id="card" value="card">
+                                <label class="form-check-label" for="card">
+                                    Pay with Credit/Debit Card
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary btn-lg" type="submit">
+                                Proceed to Payment
+                            </button>
+                        </div>
                     </form>
                 </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{% url 'cart:cart_detail' %}" class="text-decoration-none">
+                    Back to cart
+                </a>
             </div>
         </div>
     </div>
