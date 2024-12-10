@@ -26,7 +26,7 @@ A modern e-commerce platform built with Django, featuring product management, sh
   - Image handling for products
 
 #### 2. Cart App (`cart/`)
-- Shopping cart management
+- Shopping cart management.
 - Session-based cart storage
 - Features:
   - Add/remove products
