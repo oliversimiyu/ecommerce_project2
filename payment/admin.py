@@ -13,6 +13,7 @@ class TransactionAdmin(admin.ModelAdmin):
     search_fields = ['transaction_id', 'reference_number', 'order__id']
     readonly_fields = ['created_at', 'updated_at']
     date_hierarchy = 'created_at'
+    list_per_page = 20
     
     fieldsets = (
         ('Transaction Information', {
@@ -43,6 +44,8 @@ class PaymentReportAdmin(admin.ModelAdmin):
     list_filter = ['report_type', 'report_date']
     readonly_fields = ['generated_at']
     date_hierarchy = 'report_date'
+    list_per_page = 20
+    search_fields = ['report_type']
     
     fieldsets = (
         ('Report Overview', {
