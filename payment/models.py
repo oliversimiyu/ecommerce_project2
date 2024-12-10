@@ -57,6 +57,9 @@ class PaymentReport(models.Model):
     failed_transactions = models.IntegerField(default=0)
     refunded_transactions = models.IntegerField(default=0)
     average_transaction_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_profit = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_loss = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    net_revenue = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     generated_at = models.DateTimeField(auto_now_add=True)
     report_data = models.JSONField(default=dict)
 

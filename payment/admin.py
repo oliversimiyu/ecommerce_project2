@@ -44,19 +44,39 @@ class TransactionAdmin(admin.ModelAdmin):
 @admin.register(PaymentReport)
 class PaymentReportAdmin(admin.ModelAdmin):
     list_display = ['report_date', 'report_type', 'total_transactions', 
-                   'total_amount', 'successful_transactions', 'generated_at']
+                   'total_amount', 'successful_transactions', 'total_profit',
+                   'total_loss', 'net_revenue', 'generated_at']
     list_filter = ['report_type', 'report_date']
     readonly_fields = ['generated_at', 'total_transactions', 'total_amount',
                       'successful_transactions', 'failed_transactions',
-                      'refunded_transactions', 'average_transaction_amount']
+                      'refunded_transactions', 'average_transaction_amount',
+                      'total_profit', 'total_loss', 'net_revenue']
     date_hierarchy = 'report_date'
     
+    fieldsets = (
+        ('Report Overview', {
+            'fields': ('report_date', 'report_type', 'generated_at')
+        }),
+        ('Transaction Statistics', {
+            'fields': ('total_transactions', 'successful_transactions',
+                      'failed_transactions', 'refunded_transactions',
+                      'average_transaction_amount')
+        }),
+        ('Financial Summary', {
+            'fields': ('total_amount', 'total_profit', 'total_loss',
+                      'net_revenue'),
+            'classes': ('wide',)
+        }),
+        ('Detailed Data', {
+            'fields': ('report_data',),
+            'classes': ('collapse',)
+        }),
+    )
+
     def has_add_permission(self, request):
-        # Reports should only be generated through the custom action
         return False
 
     def has_delete_permission(self, request, obj=None):
-        # Prevent deletion of reports
         return False
 
     actions = ['generate_report']
@@ -66,9 +86,8 @@ class PaymentReportAdmin(admin.ModelAdmin):
         today = timezone.now().date()
         
         # Calculate daily statistics
-        daily_stats = Transaction.objects.filter(
-            created_at__date=today
-        ).aggregate(
+        transactions = Transaction.objects.filter(created_at__date=today)
+        daily_stats = transactions.aggregate(
             total_count=Count('id'),
             total_amount=Sum('amount'),
             successful=Count('id', filter={'status': 'completed'}),
@@ -76,10 +95,28 @@ class PaymentReportAdmin(admin.ModelAdmin):
             refunded=Count('id', filter={'status': 'refunded'})
         )
 
+        # Calculate profits and losses
+        completed_transactions = transactions.filter(status='completed')
+        refunded_transactions = transactions.filter(status='refunded')
+        
+        total_profit = completed_transactions.aggregate(
+            profit=Sum('amount'))['profit'] or 0
+        
+        total_loss = refunded_transactions.aggregate(
+            loss=Sum('amount'))['loss'] or 0
+        
+        net_revenue = total_profit - total_loss
+
         if daily_stats['total_count'] > 0:
             avg_amount = daily_stats['total_amount'] / daily_stats['total_count']
         else:
             avg_amount = 0
+
+        # Enhance report data with payment method breakdown
+        payment_methods = transactions.values('payment_method').annotate(
+            count=Count('id'),
+            total=Sum('amount')
+        )
 
         # Create or update daily report
         PaymentReport.objects.update_or_create(
@@ -92,7 +129,18 @@ class PaymentReportAdmin(admin.ModelAdmin):
                 'failed_transactions': daily_stats['failed'] or 0,
                 'refunded_transactions': daily_stats['refunded'] or 0,
                 'average_transaction_amount': avg_amount,
-                'report_data': daily_stats
+                'total_profit': total_profit,
+                'total_loss': total_loss,
+                'net_revenue': net_revenue,
+                'report_data': {
+                    'statistics': daily_stats,
+                    'payment_methods': list(payment_methods),
+                    'financial_summary': {
+                        'total_profit': float(total_profit),
+                        'total_loss': float(total_loss),
+                        'net_revenue': float(net_revenue)
+                    }
+                }
             }
         )
 

@@ -1,0 +1,352 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.css">
+<style>
+    .dashboard-container {
+        padding: 20px;
+    }
+    .card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        padding: 20px;
+    }
+    .stat-card {
+        text-align: center;
+        padding: 15px;
+    }
+    .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    .stat-label {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 20px;
+    }
+    .refresh-button {
+        float: right;
+        padding: 5px 10px;
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .refresh-button:hover {
+        background: #2980b9;
+    }
+    .date-picker {
+        padding: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Payment Dashboard
+                <button onclick="refreshAllReports()" class="refresh-button">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+                <input type="date" id="reportDate" class="date-picker" 
+                       onchange="refreshAllReports(this.value)">
+            </h1>
+        </div>
+    </div>
+
+    <!-- Daily Stats -->
+    <div class="card">
+        <h3>Today's Overview</h3>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value" id="daily-amount">
+                        KSh {{ daily_report.total_amount|floatformat:2 }}
+                    </div>
+                    <div class="stat-label">Total Amount</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value" id="daily-transactions">
+                        {{ daily_report.total_transactions }}
+                    </div>
+                    <div class="stat-label">Transactions</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value" id="daily-success-rate">
+                        {{ daily_report.successful_transactions }}
+                    </div>
+                    <div class="stat-label">Successful</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value" id="daily-avg-amount">
+                        KSh {{ daily_report.average_transaction_amount|floatformat:2 }}
+                    </div>
+                    <div class="stat-label">Average Amount</div>
+                </div>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="dailyChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Weekly Stats -->
+    <div class="card">
+        <h3>Weekly Overview</h3>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value" id="weekly-amount">
+                        KSh {{ weekly_report.total_amount|floatformat:2 }}
+                    </div>
+                    <div class="stat-label">Weekly Total</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value" id="weekly-transactions">
+                        {{ weekly_report.total_transactions }}
+                    </div>
+                    <div class="stat-label">Total Transactions</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value" id="weekly-success-rate">
+                        {{ weekly_report.successful_transactions }}
+                    </div>
+                    <div class="stat-label">Successful Transactions</div>
+                </div>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="weeklyChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Monthly Stats -->
+    <div class="card">
+        <h3>Monthly Overview</h3>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value" id="monthly-amount">
+                        KSh {{ monthly_report.total_amount|floatformat:2 }}
+                    </div>
+                    <div class="stat-label">Monthly Total</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value" id="monthly-transactions">
+                        {{ monthly_report.total_transactions }}
+                    </div>
+                    <div class="stat-label">Total Transactions</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value" id="monthly-success-rate">
+                        {{ monthly_report.successful_transactions }}
+                    </div>
+                    <div class="stat-label">Successful Transactions</div>
+                </div>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="monthlyChart"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+<script>
+let dailyChart, weeklyChart, monthlyChart;
+
+function initializeCharts(dailyData, weeklyData, monthlyData) {
+    // Daily Chart
+    const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+    dailyChart = new Chart(dailyCtx, {
+        type: 'line',
+        data: {
+            labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+            datasets: [{
+                label: 'Transactions',
+                data: new Array(24).fill(0),
+                borderColor: '#3498db',
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    // Weekly Chart
+    const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
+    weeklyChart = new Chart(weeklyCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Daily Totals',
+                data: new Array(7).fill(0),
+                backgroundColor: '#2ecc71'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    // Monthly Chart
+    const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+    monthlyChart = new Chart(monthlyCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
+            datasets: [{
+                label: 'Weekly Totals',
+                data: new Array(5).fill(0),
+                backgroundColor: '#e74c3c'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    updateCharts(dailyData, weeklyData, monthlyData);
+}
+
+function updateCharts(dailyData, weeklyData, monthlyData) {
+    // Update Daily Chart
+    if (dailyData && dailyData.report_data && dailyData.report_data.hourly_breakdown) {
+        const hourlyData = new Array(24).fill(0);
+        dailyData.report_data.hourly_breakdown.forEach(item => {
+            hourlyData[item.hour] = item.count;
+        });
+        dailyChart.data.datasets[0].data = hourlyData;
+        dailyChart.update();
+    }
+
+    // Update Weekly Chart
+    if (weeklyData && weeklyData.report_data && weeklyData.report_data.daily_breakdown) {
+        const dailyTotals = weeklyData.report_data.daily_breakdown.map(item => item.total);
+        weeklyChart.data.datasets[0].data = dailyTotals;
+        weeklyChart.update();
+    }
+
+    // Update Monthly Chart
+    if (monthlyData && monthlyData.report_data && monthlyData.report_data.weekly_breakdown) {
+        const weeklyTotals = monthlyData.report_data.weekly_breakdown.map(item => item.total);
+        monthlyChart.data.datasets[0].data = weeklyTotals;
+        monthlyChart.update();
+    }
+}
+
+function updateStats(data) {
+    // Update Daily Stats
+    if (data.daily) {
+        document.getElementById('daily-amount').textContent = 
+            `KSh ${data.daily.total_amount.toFixed(2)}`;
+        document.getElementById('daily-transactions').textContent = 
+            data.daily.total_transactions;
+        document.getElementById('daily-success-rate').textContent = 
+            data.daily.successful_transactions;
+    }
+
+    // Update Weekly Stats
+    if (data.weekly) {
+        document.getElementById('weekly-amount').textContent = 
+            `KSh ${data.weekly.total_amount.toFixed(2)}`;
+        document.getElementById('weekly-transactions').textContent = 
+            data.weekly.total_transactions;
+        document.getElementById('weekly-success-rate').textContent = 
+            data.weekly.successful_transactions;
+    }
+
+    // Update Monthly Stats
+    if (data.monthly) {
+        document.getElementById('monthly-amount').textContent = 
+            `KSh ${data.monthly.total_amount.toFixed(2)}`;
+        document.getElementById('monthly-transactions').textContent = 
+            data.monthly.total_transactions;
+        document.getElementById('monthly-success-rate').textContent = 
+            data.monthly.successful_transactions;
+    }
+}
+
+function refreshAllReports(date = null) {
+    const url = new URL('{% url "payment:refresh_reports" %}', window.location.origin);
+    if (date) {
+        url.searchParams.append('date', date);
+    }
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            updateStats(data);
+            updateCharts(data.daily, data.weekly, data.monthly);
+        })
+        .catch(error => console.error('Error refreshing reports:', error));
+}
+
+// Initialize charts when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts(
+        {{ daily_report.report_data|safe }},
+        {{ weekly_report.report_data|safe }},
+        {{ monthly_report.report_data|safe }}
+    );
+
+    // Set up auto-refresh every 5 minutes
+    setInterval(refreshAllReports, 300000);
+});
+</script>
+{% endblock %}

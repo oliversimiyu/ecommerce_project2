@@ -9,6 +9,11 @@ import uuid
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from django.contrib.admin.views.decorators import staff_member_required
+from .reports import (
+    generate_daily_report, generate_weekly_report,
+    generate_monthly_report, get_latest_reports
+)
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -170,3 +175,71 @@ def mpesa_payment(request):
         return redirect('payment:completed')
     
     return render(request, 'payment/mpesa.html', {'order': order})
+
+@staff_member_required
+def payment_dashboard(request):
+    """Dashboard view for payment reports"""
+    # Generate latest reports
+    daily_report = generate_daily_report()
+    weekly_report = generate_weekly_report()
+    monthly_report = generate_monthly_report()
+    
+    return render(request, 'payment/dashboard.html', {
+        'daily_report': daily_report,
+        'weekly_report': weekly_report,
+        'monthly_report': monthly_report
+    })
+
+@staff_member_required
+def refresh_reports(request):
+    """AJAX endpoint to refresh report data"""
+    report_type = request.GET.get('type', 'all')
+    date_str = request.GET.get('date')
+    
+    try:
+        if date_str:
+            date = timezone.datetime.strptime(date_str, '%Y-%m-%d').date()
+        else:
+            date = timezone.now().date()
+            
+        if report_type == 'daily':
+            report = generate_daily_report(date)
+        elif report_type == 'weekly':
+            report = generate_weekly_report(date)
+        elif report_type == 'monthly':
+            report = generate_monthly_report(date)
+        else:
+            # Generate all reports
+            daily = generate_daily_report(date)
+            weekly = generate_weekly_report(date)
+            monthly = generate_monthly_report(date)
+            return JsonResponse({
+                'daily': {
+                    'total_amount': float(daily.total_amount),
+                    'total_transactions': daily.total_transactions,
+                    'successful_transactions': daily.successful_transactions,
+                    'report_data': daily.report_data
+                },
+                'weekly': {
+                    'total_amount': float(weekly.total_amount),
+                    'total_transactions': weekly.total_transactions,
+                    'successful_transactions': weekly.successful_transactions,
+                    'report_data': weekly.report_data
+                },
+                'monthly': {
+                    'total_amount': float(monthly.total_amount),
+                    'total_transactions': monthly.total_transactions,
+                    'successful_transactions': monthly.successful_transactions,
+                    'report_data': monthly.report_data
+                }
+            })
+            
+        return JsonResponse({
+            'total_amount': float(report.total_amount),
+            'total_transactions': report.total_transactions,
+            'successful_transactions': report.successful_transactions,
+            'report_data': report.report_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
