@@ -41,7 +41,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     def total_cost(self, obj):
         total = obj.get_total_cost()
-        formatted_cost = '${:.2f}'.format(float(total))
+        formatted_cost = 'KSh {:.2f}'.format(float(total))
         return format_html('<span>{}</span>', formatted_cost)
     total_cost.short_description = 'Total Cost'
 

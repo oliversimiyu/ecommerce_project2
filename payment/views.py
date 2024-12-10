@@ -56,7 +56,7 @@ def payment_process(request):
             payment_method_types=['card'],
             line_items=[{
                 'price_data': {
-                    'currency': 'usd',
+                    'currency': 'kes',
                     'unit_amount': int(order.get_total_cost() * 100),
                     'product_data': {
                         'name': f'Order {order.id}'

@@ -35,8 +35,8 @@
                                     <input type="submit" value="Update" class="btn btn-sm btn-outline-secondary ms-2">
                                 </form>
                             </td>
-                            <td>${{ item.price }}</td>
-                            <td>${{ item.total_price }}</td>
+                            <td>KSh {{ item.price }}</td>
+                            <td>KSh {{ item.total_price }}</td>
                             <td>
                                 <form action="{% url 'cart:cart_remove' product.id %}" method="post">
                                     {% csrf_token %}
@@ -48,7 +48,7 @@
                 {% endfor %}
                 <tr class="table-primary">
                     <td colspan="4"><strong>Total</strong></td>
-                    <td><strong>${{ cart.get_total_price }}</strong></td>
+                    <td><strong>KSh {{ cart.get_total_price }}</strong></td>
                 </tr>
             </tbody>
         </table>
