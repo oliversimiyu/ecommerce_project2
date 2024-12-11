@@ -150,19 +150,18 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container-fluid px-4">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'products:product_list' %}">E-Shop</a>
+            <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand" href="{% url 'products:product_list' %}">E-Shop</a>
-            
-            <form class="search-form d-flex" action="{% url 'products:product_search' %}" method="get">
-                <input class="form-control search-input" type="search" name="q" placeholder="Search products, brands and categories" aria-label="Search" value="{{ search_query|default:'' }}">
-                <button class="search-button" type="submit">SEARCH</button>
-            </form>
-
             <div class="collapse navbar-collapse" id="navbarNav">
+                <form class="search-form d-flex" action="{% url 'products:product_search' %}" method="get">
+                    <input class="form-control search-input" type="search" name="q" placeholder="Search products, brands and categories" aria-label="Search" value="{{ search_query|default:'' }}">
+                    <button class="search-button" type="submit">SEARCH</button>
+                </form>
+
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'cart:cart_detail' %}">
