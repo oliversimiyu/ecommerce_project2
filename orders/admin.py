@@ -31,7 +31,7 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('address', ('postal_code', 'city'))
         }),
         ('Order Status', {
-            'fields': ('paid', 'braintree_id')
+            'fields': ('paid',)
         }),
     )
 
