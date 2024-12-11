@@ -3,19 +3,19 @@
 {% block title %}Products{% endblock %}
 
 {% block content %}
-<div class="row mx-0">
+<div class="row g-4">
     <!-- Category Sidebar -->
-    <div class="col-md-2 mb-4">
+    <div class="col-md-2">
         <div class="category-sidebar">
             <h5 class="p-3 mb-0 border-bottom">CATEGORIES</h5>
             <div class="list-group list-group-flush">
                 <a href="{% url 'products:product_list' %}" 
-                   class="category-link list-group-item list-group-item-action {% if not category %}active{% endif %}">
+                   class="list-group-item list-group-item-action {% if not category %}active{% endif %}">
                     All Products
                 </a>
                 {% for c in categories %}
                     <a href="{{ c.get_absolute_url }}" 
-                       class="category-link list-group-item list-group-item-action {% if category.slug == c.slug %}active{% endif %}">
+                       class="list-group-item list-group-item-action {% if category.slug == c.slug %}active{% endif %}">
                         {{ c.name }}
                     </a>
                 {% endfor %}
@@ -25,7 +25,7 @@
 
     <!-- Product Grid -->
     <div class="col-md-10">
-        <div class="d-flex justify-content-between align-items-center mb-3 px-3">
+        <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="mb-0">{% if category %}{{ category.name }}{% else %}Recommended For You{% endif %}</h4>
             <div class="dropdown">
                 <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
@@ -40,7 +40,7 @@
         </div>
 
         {% if products %}
-            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6 g-3 px-3">
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">
                 {% for product in products %}
                     <div class="col">
                         <div class="card h-100 product-card">
