@@ -9,16 +9,26 @@ def product_list(request, category_slug=None):
     category = None
     categories = Category.objects.all()
     products = Product.objects.filter(available=True)
+    sort = request.GET.get('sort', '')
     
     if category_slug:
         category = get_object_or_404(Category, slug=category_slug)
         products = products.filter(category=category)
     
+    # Apply sorting
+    if sort == 'name':
+        products = products.order_by('name')
+    elif sort == 'price':
+        products = products.order_by('price')
+    elif sort == '-price':
+        products = products.order_by('-price')
+    
     return render(request,
                  'products/list.html',
                  {'category': category,
                   'categories': categories,
-                  'products': products})
+                  'products': products,
+                  'current_sort': sort})
 
 def product_detail(request, id, slug):
     product = get_object_or_404(Product, id=id, slug=slug, available=True)
@@ -31,6 +41,7 @@ def product_detail(request, id, slug):
 def product_search(request):
     query = request.GET.get('q', '')
     categories = Category.objects.all()
+    sort = request.GET.get('sort', '')
     
     if query:
         products = Product.objects.filter(
@@ -42,8 +53,17 @@ def product_search(request):
     else:
         products = Product.objects.filter(available=True)
     
+    # Apply sorting
+    if sort == 'name':
+        products = products.order_by('name')
+    elif sort == 'price':
+        products = products.order_by('price')
+    elif sort == '-price':
+        products = products.order_by('-price')
+    
     return render(request,
                  'products/list.html',
                  {'products': products,
                   'categories': categories,
-                  'search_query': query})
+                  'search_query': query,
+                  'current_sort': sort})

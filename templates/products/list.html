@@ -29,12 +29,18 @@
             <h4 class="mb-0">{% if category %}{{ category.name }}{% else %}Recommended For You{% endif %}</h4>
             <div class="dropdown">
                 <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
-                    Sort By
+                    Sort By: {% if current_sort == 'name' %}Name
+                    {% elif current_sort == 'price' %}Price: Low to High
+                    {% elif current_sort == '-price' %}Price: High to Low
+                    {% else %}Default{% endif %}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="?sort=name">Name</a></li>
-                    <li><a class="dropdown-item" href="?sort=price">Price: Low to High</a></li>
-                    <li><a class="dropdown-item" href="?sort=-price">Price: High to Low</a></li>
+                    <li><a class="dropdown-item {% if current_sort == 'name' %}active{% endif %}" 
+                          href="?{% if search_query %}q={{ search_query }}&{% endif %}sort=name">Name</a></li>
+                    <li><a class="dropdown-item {% if current_sort == 'price' %}active{% endif %}" 
+                          href="?{% if search_query %}q={{ search_query }}&{% endif %}sort=price">Price: Low to High</a></li>
+                    <li><a class="dropdown-item {% if current_sort == '-price' %}active{% endif %}" 
+                          href="?{% if search_query %}q={{ search_query }}&{% endif %}sort=-price">Price: High to Low</a></li>
                 </ul>
             </div>
         </div>
