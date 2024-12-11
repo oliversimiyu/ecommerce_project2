@@ -3,126 +3,124 @@
 {% block title %}Products{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <!-- Category Sidebar -->
-        <div class="col-md-3 mb-4">
-            <div class="category-sidebar">
-                <h5 class="p-3 mb-0 border-bottom">CATEGORIES</h5>
-                <div class="list-group list-group-flush">
-                    <a href="{% url 'products:product_list' %}" 
-                       class="category-link {% if not category %}fw-bold{% endif %}">
-                        All Products
+<div class="row mx-0">
+    <!-- Category Sidebar -->
+    <div class="col-md-2 mb-4">
+        <div class="category-sidebar">
+            <h5 class="p-3 mb-0 border-bottom">CATEGORIES</h5>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'products:product_list' %}" 
+                   class="category-link list-group-item list-group-item-action {% if not category %}active{% endif %}">
+                    All Products
+                </a>
+                {% for c in categories %}
+                    <a href="{{ c.get_absolute_url }}" 
+                       class="category-link list-group-item list-group-item-action {% if category.slug == c.slug %}active{% endif %}">
+                        {{ c.name }}
                     </a>
-                    {% for c in categories %}
-                        <a href="{{ c.get_absolute_url }}" 
-                           class="category-link {% if category.slug == c.slug %}fw-bold{% endif %}">
-                            {{ c.name }}
-                        </a>
-                    {% endfor %}
-                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="col-md-10">
+        <div class="d-flex justify-content-between align-items-center mb-3 px-3">
+            <h4 class="mb-0">{% if category %}{{ category.name }}{% else %}Recommended For You{% endif %}</h4>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
+                    Sort By
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="?sort=name">Name</a></li>
+                    <li><a class="dropdown-item" href="?sort=price">Price: Low to High</a></li>
+                    <li><a class="dropdown-item" href="?sort=-price">Price: High to Low</a></li>
+                </ul>
             </div>
         </div>
 
-        <!-- Product Grid -->
-        <div class="col-md-9">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="mb-0">{% if category %}{{ category.name }}{% else %}Recommended For You{% endif %}</h4>
-                <div class="dropdown">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
-                        Sort By
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="?sort=name">Name</a></li>
-                        <li><a class="dropdown-item" href="?sort=price">Price: Low to High</a></li>
-                        <li><a class="dropdown-item" href="?sort=-price">Price: High to Low</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            {% if products %}
-                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
-                    {% for product in products %}
-                        <div class="col">
-                            <div class="card h-100 product-card">
-                                {% if product.discount_percentage > 0 %}
-                                    <span class="discount-badge">-{{ product.discount_percentage }}%</span>
+        {% if products %}
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6 g-3 px-3">
+                {% for product in products %}
+                    <div class="col">
+                        <div class="card h-100 product-card">
+                            {% if product.discount_percentage > 0 %}
+                                <span class="discount-badge">-{{ product.discount_percentage }}%</span>
+                            {% endif %}
+                            <a href="{{ product.get_absolute_url }}" class="text-decoration-none">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/300x300" class="card-img-top" alt="No image available">
                                 {% endif %}
-                                <a href="{{ product.get_absolute_url }}" class="text-decoration-none">
-                                    {% if product.image %}
-                                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-                                    {% else %}
-                                        <img src="https://via.placeholder.com/300x300" class="card-img-top" alt="No image available">
-                                    {% endif %}
-                                    <div class="card-body">
-                                        <h6 class="product-title text-dark">{{ product.name }}</h6>
-                                        <div class="mb-2">
-                                            <span class="product-price">KSh {{ product.price }}</span>
-                                            {% if product.discount_percentage > 0 %}
-                                                <br>
-                                                <span class="original-price">KSh {{ product.original_price }}</span>
-                                            {% endif %}
-                                        </div>
-                                        {% if product.rating %}
-                                            <div class="rating-stars">
-                                                {% for i in "12345"|make_list %}
-                                                    {% if forloop.counter <= product.rating %}
-                                                        <i class="fas fa-star"></i>
-                                                    {% else %}
-                                                        <i class="far fa-star"></i>
-                                                    {% endif %}
-                                                {% endfor %}
-                                                <span class="text-muted ms-1">({{ product.reviews_count }})</span>
-                                            </div>
-                                        {% endif %}
-                                        {% if product.express_delivery %}
-                                            <small class="text-success">
-                                                <i class="fas fa-truck"></i> Express Delivery
-                                            </small>
+                                <div class="card-body">
+                                    <h6 class="product-title text-dark">{{ product.name }}</h6>
+                                    <div class="mb-2">
+                                        <span class="product-price">KSh {{ product.price }}</span>
+                                        {% if product.discount_percentage > 0 %}
+                                            <br>
+                                            <span class="original-price">KSh {{ product.original_price }}</span>
                                         {% endif %}
                                     </div>
-                                </a>
-                            </div>
+                                    {% if product.rating %}
+                                        <div class="rating-stars">
+                                            {% for i in "12345"|make_list %}
+                                                {% if forloop.counter <= product.rating %}
+                                                    <i class="fas fa-star"></i>
+                                                {% else %}
+                                                    <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                            <span class="text-muted ms-1">({{ product.reviews_count }})</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if product.express_delivery %}
+                                        <small class="text-success">
+                                            <i class="fas fa-truck"></i> Express Delivery
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </a>
                         </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                No products available in this category.
+            </div>
+        {% endif %}
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ num }}</a></li>
+                        {% endif %}
                     {% endfor %}
-                </div>
-            {% else %}
-                <div class="alert alert-info">
-                    No products available in this category.
-                </div>
-            {% endif %}
 
-            <!-- Pagination -->
-            {% if is_paginated %}
-                <nav aria-label="Page navigation" class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        {% if page_obj.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                        {% endif %}
-
-                        {% for num in page_obj.paginator.page_range %}
-                            {% if page_obj.number == num %}
-                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                            {% else %}
-                                <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ num }}</a></li>
-                            {% endif %}
-                        {% endfor %}
-
-                        {% if page_obj.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-            {% endif %}
-        </div>
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
