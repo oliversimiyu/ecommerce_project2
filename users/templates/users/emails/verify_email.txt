@@ -1,0 +1,12 @@
+Welcome to Our E-commerce Store!
+
+Hello {{ user.username }},
+
+Thank you for registering with us. To complete your registration and verify your email address, please click the link below:
+
+{{ verification_url }}
+
+If you didn't create an account with us, you can safely ignore this email.
+
+Best regards,
+The E-commerce Team
